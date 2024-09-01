@@ -17,8 +17,6 @@ class MainActivity : AppCompatActivity() {
         viewModel.shopItemListLiveData.observe(this){
             Log.d("MainActivityTest", it.toString())
         }
-        viewModel.getShopList()
-        viewModel.deleteShopItem(5)
-        viewModel.toggleEnabled(7)
+        viewModel.deleteShopItem(4)
     }
 }

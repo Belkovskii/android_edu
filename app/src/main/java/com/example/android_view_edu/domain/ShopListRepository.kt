@@ -1,5 +1,7 @@
 package com.example.android_view_edu.domain
 
+import androidx.lifecycle.MutableLiveData
+
 interface ShopListRepository {
 
     fun addShopItem(shopItem: ShopItem)
@@ -10,5 +12,5 @@ interface ShopListRepository {
 
     fun deleteShopItem(id : Int)
 
-    fun getShopItemsList() : List<ShopItem>
+    fun getShopItemsList() : MutableLiveData<List<ShopItem>>
 }
