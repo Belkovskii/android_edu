@@ -16,7 +16,7 @@ class MainViewModel : ViewModel() {
 
     private val editShopItemUseCase = EditShopItemUseCase(dataRepository)
 
-    val shopItemListLiveData = dataRepository.shopItemsListLiveData //MutableLiveData<List<ShopItem>>()
+    val shopItemListLiveData  = GetShopListUseCase(dataRepository).getShopItemsList()
 
     fun getShopList() {
         getShopListUseCase.getShopItemsList()
