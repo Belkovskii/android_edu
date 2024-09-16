@@ -3,6 +3,7 @@ package com.example.android_view_edu.data
 import androidx.lifecycle.MutableLiveData
 import com.example.android_view_edu.domain.ShopItem
 import com.example.android_view_edu.domain.ShopListRepository
+import kotlin.random.Random
 
 object ShopListRepositoryImpl : ShopListRepository {
 
@@ -10,8 +11,8 @@ object ShopListRepositoryImpl : ShopListRepository {
     val shopItemsListLiveData = MutableLiveData<List<ShopItem>>()
 
     init {
-        for (i in 0 until 10) {
-            val item = ShopItem("Test name $i", i, true)
+        for (i in 0 until 1000) {
+            val item = ShopItem("Test name $i", i, Random.nextBoolean())
             addShopItem(item)
         }
     }
@@ -49,4 +50,5 @@ object ShopListRepositoryImpl : ShopListRepository {
     private fun updateLiveData() {
         shopItemsListLiveData.value = shopItemsList.toList()
     }
+
 }
