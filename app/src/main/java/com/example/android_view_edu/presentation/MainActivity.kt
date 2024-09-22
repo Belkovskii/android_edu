@@ -70,15 +70,13 @@ class MainActivity : AppCompatActivity() {
                 val item = recyclerViewAdapter.currentList[position]
                 val id = item.id
                 if (id > -1) {
-                    recyclerViewAdapter.deleteItem?.invoke(id)
+                    viewModel.deleteShopItem(id)
                 }
             }
         }
         val itemTouchHelper = ItemTouchHelper(callback)
         itemTouchHelper.attachToRecyclerView(recyclerView)
-        recyclerViewAdapter.deleteItem = {
-            viewModel.deleteShopItem(it)
-        }
+
     }
 
 }
