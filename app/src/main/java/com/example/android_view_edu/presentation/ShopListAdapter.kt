@@ -1,14 +1,11 @@
 package com.example.android_view_edu.presentation
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.example.android_view_edu.R
 import com.example.android_view_edu.domain.ShopItem
+
 class ShopListAdapter : ListAdapter<ShopItem, ShopItemViewHolder>(ShopItemDiffCallback()) {
 
     var itemLongClickListener : ((ShopItem) -> Unit)? = null

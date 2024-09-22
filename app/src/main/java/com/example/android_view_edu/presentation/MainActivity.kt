@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android_view_edu.R
-import com.example.android_view_edu.domain.ShopItem
 
 class MainActivity : AppCompatActivity() {
 
