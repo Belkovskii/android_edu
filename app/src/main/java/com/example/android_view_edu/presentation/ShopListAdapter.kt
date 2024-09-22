@@ -10,7 +10,10 @@ import com.example.android_view_edu.domain.ShopItem
 
 class ShopListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    var itemLongClickListener : ItemLongClickListener? = null
+    var itemLongClickListener : ((ShopItem) -> Unit)? = null
+    var itemClickListener : ((ShopItem) -> Unit)? = null
+    var deleteItem : ((Int) -> Unit)? = null
+
 
     var shopItemsList = listOf<ShopItem>()
         set(value) {
@@ -20,10 +23,7 @@ class ShopListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     class ShopItemViewHolder(val view : View) : RecyclerView.ViewHolder(view) {
         var tvName = view.findViewById<TextView>(R.id.tv_name)
         var tvCount = view.findViewById<TextView>(R.id.tv_count)
-    }
 
-    interface ItemLongClickListener {
-        fun onItemLongClick(shopItem : ShopItem)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -37,13 +37,22 @@ class ShopListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun getItemCount(): Int = shopItemsList.size
 
+    override fun getItemId(position: Int): Long {
+        val item = shopItemsList[position];
+        return item.id.toLong()
+    }
+
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = shopItemsList[position]
         if (holder is ShopItemViewHolder) {
             holder.tvName.text = item.name
             holder.tvCount.text = item.count.toString()
             holder.view.setOnLongClickListener{
-                itemLongClickListener?.onItemLongClick(item)
+                itemLongClickListener?.invoke(item)
+                true
+            }
+            holder.view.setOnClickListener{
+                itemClickListener?.invoke(item)
                 true
             }
         }
@@ -52,4 +61,6 @@ class ShopListAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun getItemViewType(position: Int): Int {
         return if (shopItemsList[position].enabled) 1 else 0
     }
+
+
 }

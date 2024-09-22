@@ -3,15 +3,20 @@ package com.example.android_view_edu.data
 import androidx.lifecycle.MutableLiveData
 import com.example.android_view_edu.domain.ShopItem
 import com.example.android_view_edu.domain.ShopListRepository
+import java.util.TreeSet
 import kotlin.random.Random
 
 object ShopListRepositoryImpl : ShopListRepository {
 
-    private val shopItemsList : MutableList<ShopItem> = mutableListOf<ShopItem>()
+    private var shopItemsList : TreeSet<ShopItem>
     val shopItemsListLiveData = MutableLiveData<List<ShopItem>>()
 
     init {
-        for (i in 0 until 1000) {
+        val comparator = Comparator<ShopItem>{ item1, item2 ->
+            item1.id.compareTo(item2.id)
+        }
+        shopItemsList = TreeSet<ShopItem>(comparator)
+        for (i in 0 until 10) {
             val item = ShopItem("Test name $i", i, Random.nextBoolean())
             addShopItem(item)
         }
