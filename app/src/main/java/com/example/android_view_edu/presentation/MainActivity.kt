@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
         setRecyclerView()
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         viewModel.shopItemListLiveData.observe(this){
-            recyclerViewAdapter.shopItemsList = it
+            recyclerViewAdapter.submitList(it)
         }
     }
 
@@ -28,21 +28,27 @@ class MainActivity : AppCompatActivity() {
         val recyclerView = findViewById<RecyclerView>(R.id.rv_shop_list)
         with(recyclerView) {
             recyclerViewAdapter = ShopListAdapter()
-            recyclerViewAdapter.itemLongClickListener = {
-                viewModel.toggleEnabled(it.id)
-            }
-            recyclerViewAdapter.deleteItem = {
-                viewModel.deleteShopItem(it)
-            }
-            recyclerViewAdapter.itemClickListener = {
-                Log.d("click_listener",
-                    it.name + " -> " + it.count.toString()
-                )
-            }
             adapter = recyclerViewAdapter
             recycledViewPool.setMaxRecycledViews(0, 10)
             recycledViewPool.setMaxRecycledViews(1, 10)
-            setupSwipeListener(this)
+        }
+        setupClickListener()
+        setupSwipeListener(recyclerView)
+        setupLongClickListener()
+    }
+
+    private fun setupClickListener() {
+        recyclerViewAdapter.itemClickListener = {
+            Log.d(
+                "click_listener",
+                it.name + " -> " + it.count.toString()
+            )
+        }
+    }
+
+    private fun setupLongClickListener() {
+        recyclerViewAdapter.itemLongClickListener = {
+            viewModel.toggleEnabled(it.id)
         }
     }
 
@@ -61,7 +67,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
-                val item = recyclerViewAdapter.shopItemsList[position]
+                val item = recyclerViewAdapter.currentList[position]
                 val id = item.id
                 if (id > -1) {
                     recyclerViewAdapter.deleteItem?.invoke(id)
@@ -70,6 +76,9 @@ class MainActivity : AppCompatActivity() {
         }
         val itemTouchHelper = ItemTouchHelper(callback)
         itemTouchHelper.attachToRecyclerView(recyclerView)
+        recyclerViewAdapter.deleteItem = {
+            viewModel.deleteShopItem(it)
+        }
     }
 
 }
