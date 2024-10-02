@@ -15,13 +15,6 @@ import com.google.android.material.textfield.TextInputLayout
 
 class ShopItemActivity : AppCompatActivity() {
 
-    private lateinit var tilName: TextInputLayout
-    private lateinit var tilCount: TextInputLayout
-    private lateinit var etName: EditText
-    private lateinit var etCount: EditText
-    private lateinit var addItemButton: Button
-    private lateinit var viewModel : ShopItemViewModel
-
     private var mode = UNDEFINED_MODE
     private var shopItemId = ShopItem.UNDEFINED_ID
 
@@ -29,72 +22,17 @@ class ShopItemActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_shop_item)
         parseExtras()
-        initViews()
-        setViewModelListeners()
-        setInputTextChangeListeners()
-        when (mode) {
-            EDIT_MODE -> launchEditMode()
-            CREATE_MODE -> launchCreateMode()
-        }
+        insertFragmentIntoContainer()
     }
 
-    private fun setInputTextChangeListeners() {
-        etName.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                viewModel.resetInputNameError()
-            }
-            override fun afterTextChanged(p0: Editable?) {}
-        })
-        etCount.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                viewModel.resetInputCountError()
-            }
-            override fun afterTextChanged(p0: Editable?) {}
-        })
-    }
-
-    private fun setViewModelListeners() {
-        val context = this
-        with(viewModel) {
-            errorInputName.observe(context){
-                etName.error = if (it) "Error" else null
-            }
-            errorInputCount.observe(context){
-                etCount.error = if (it) "Error" else null
-            }
-            closeScreen.observe(context) {
-                finish()
-            }
+    private fun insertFragmentIntoContainer() {
+        val transaction = supportFragmentManager.beginTransaction()
+        val fragment = when (mode) {
+            EDIT_MODE -> ShopItemFragment.createEditModeFragment(shopItemId)
+            CREATE_MODE -> ShopItemFragment.createAddModeFragment()
+            else -> {throw RuntimeException("Wrong mode $mode")}
         }
-    }
-
-    private fun launchEditMode() {
-        viewModel.shopItem.observe(this){
-            etName.setText(it.name)
-            etCount.setText(it.count.toString())
-        }
-        viewModel.getShopItem(shopItemId)
-        addItemButton.setOnClickListener{
-            viewModel.editShopItem(
-                etName.text.toString(),
-                etCount.text.toString(),
-                shopItemId
-            )
-        }
-    }
-
-    private fun launchCreateMode() {
-        addItemButton.setOnClickListener{
-            viewModel.createNewShopItem(
-                etName.text.toString(),
-                etCount.text.toString(),
-            )
-            if (etName.error == null && etCount.error == null) {
-                this.finish()
-            }
-        }
+        transaction.add(R.id.shop_item_container, fragment).commit()
     }
 
     private fun parseExtras() {
@@ -111,15 +49,6 @@ class ShopItemActivity : AppCompatActivity() {
             }
             shopItemId = intent.getIntExtra(SHOP_ITEM_ID, ShopItem.UNDEFINED_ID)
         }
-    }
-
-    private fun initViews() {
-        tilName = findViewById(R.id.til_name)
-        tilCount = findViewById(R.id.til_count)
-        etName = findViewById(R.id.et_name)
-        etCount = findViewById(R.id.et_count)
-        addItemButton = findViewById(R.id.save_button)
-        viewModel = ViewModelProvider(this)[ShopItemViewModel::class.java]
     }
 
     companion object {
@@ -142,6 +71,6 @@ class ShopItemActivity : AppCompatActivity() {
             return  intent
         }
 
-
     }
+
 }
