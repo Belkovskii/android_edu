@@ -3,6 +3,8 @@ package com.example.android_view_edu.presentation
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -13,10 +15,13 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: MainViewModel
     private lateinit var recyclerViewAdapter : ShopListAdapter
+    private var shopItemFragmentContainer : FragmentContainerView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        shopItemFragmentContainer = findViewById(R.id.fragment_shop_items)
+
         setRecyclerView()
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         viewModel.shopItemListLiveData.observe(this){
@@ -24,9 +29,22 @@ class MainActivity : AppCompatActivity() {
         }
         val addButton = findViewById<FloatingActionButton>(R.id.button_add_shop_item)
         addButton.setOnClickListener{
-            val intent = ShopItemActivity.getCreationModeIntent(this)
-            startActivity(intent)
+            if (isOnePaneMode()) {
+                val intent = ShopItemActivity.getCreationModeIntent(this)
+                startActivity(intent)
+            } else {
+                attachFragment(ShopItemFragment.createAddModeFragment())
+            }
         }
+    }
+
+    private fun attachFragment(fragment : Fragment) {
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.add(R.id.fragment_shop_items, fragment).commit()
+    }
+
+    private fun isOnePaneMode() : Boolean {
+        return shopItemFragmentContainer == null
     }
 
     private fun setRecyclerView() {
@@ -48,8 +66,13 @@ class MainActivity : AppCompatActivity() {
                 "click_listener",
                 it.name + " -> " + it.count.toString()
             )
-            val intent = ShopItemActivity.getEditModeIntent(this, it.id)
-            startActivity(intent)
+            if (isOnePaneMode()) {
+                val intent = ShopItemActivity.getEditModeIntent(this, it.id)
+                startActivity(intent)
+            } else {
+                attachFragment(ShopItemFragment.createEditModeFragment(it.id))
+            }
+
         }
     }
 

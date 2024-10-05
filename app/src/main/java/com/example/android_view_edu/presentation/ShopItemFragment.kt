@@ -15,10 +15,7 @@ import com.example.android_view_edu.domain.ShopItem
 import com.google.android.material.textfield.TextInputLayout
 
 
-class ShopItemFragment(
-    private val mode : String = UNDEFINED_MODE,
-    private var shopItemId : Int = ShopItem.UNDEFINED_ID
-) : Fragment() {
+class ShopItemFragment : Fragment() {
 
     private lateinit var tilName: TextInputLayout
     private lateinit var tilCount: TextInputLayout
@@ -26,6 +23,9 @@ class ShopItemFragment(
     private lateinit var etCount: EditText
     private lateinit var addItemButton: Button
     private lateinit var viewModel : ShopItemViewModel
+
+    private var mode : String = UNDEFINED_MODE
+    private var shopItemId : Int = ShopItem.UNDEFINED_ID
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,9 +35,12 @@ class ShopItemFragment(
         return inflater.inflate(R.layout.fragment_shop_item, container, false)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        parseParams()
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        parseParams()
         viewModel = ViewModelProvider(this)[ShopItemViewModel::class.java]
         initViews(view)
         setViewModelListeners()
@@ -104,12 +107,21 @@ class ShopItemFragment(
     }
 
     private fun parseParams() {
+        val params = requireArguments()
+        if (!params.containsKey(SCREEN_MODE)) {
+            throw RuntimeException("Screen mode is absent")
+        }
+        mode = params.getString(SCREEN_MODE, UNDEFINED_MODE)
         if (mode != CREATE_MODE && mode != EDIT_MODE) {
             throw RuntimeException("Undefined mode $mode")
         }
-        if (mode == EDIT_MODE && shopItemId == ShopItem.UNDEFINED_ID) {
-            throw RuntimeException("Shop item id is absent")
+        if (mode == EDIT_MODE) {
+            if (!params.containsKey(SHOP_ITEM_ID)) {
+                throw RuntimeException("Shop item id is absent")
+            }
+            shopItemId = params.getInt(SHOP_ITEM_ID)
         }
+
     }
 
     private fun initViews(view : View) {
@@ -121,16 +133,27 @@ class ShopItemFragment(
     }
 
     companion object {
-        private val CREATE_MODE = "create_mode"
-        private val EDIT_MODE = "edit_mode"
+        private const val SCREEN_MODE = "screen_mode"
+        private const val CREATE_MODE = "create_mode"
+        private const val EDIT_MODE = "edit_mode"
         private const val UNDEFINED_MODE = ""
+        private const val SHOP_ITEM_ID = "shop_item_id"
 
         fun createAddModeFragment() : ShopItemFragment {
-            return ShopItemFragment(CREATE_MODE)
+            return ShopItemFragment().apply {
+                arguments = Bundle().apply {
+                    putString(SCREEN_MODE, CREATE_MODE)
+                }
+            }
         }
 
         fun createEditModeFragment(shopItemId : Int) : ShopItemFragment {
-            return ShopItemFragment(EDIT_MODE, shopItemId)
+            return ShopItemFragment().apply{
+                arguments = Bundle().apply {
+                    putString(SCREEN_MODE, EDIT_MODE)
+                    putInt(SHOP_ITEM_ID, shopItemId)
+                }
+            }
         }
 
     }
