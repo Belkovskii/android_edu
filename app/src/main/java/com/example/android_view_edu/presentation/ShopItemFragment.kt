@@ -1,8 +1,10 @@
 package com.example.android_view_edu.presentation
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,24 +25,77 @@ class ShopItemFragment : Fragment() {
     private lateinit var etCount: EditText
     private lateinit var addItemButton: Button
     private lateinit var viewModel : ShopItemViewModel
+    private lateinit var onEditingFinishedListener: OnEditingFinishedListener
 
     private var mode : String = UNDEFINED_MODE
     private var shopItemId : Int = ShopItem.UNDEFINED_ID
+
+    interface OnEditingFinishedListener {
+        fun onEditingFinished()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        Log.d("Fragment log", "onAttach called")
+        if (context is OnEditingFinishedListener) {
+            onEditingFinishedListener = context
+        } else {
+            throw RuntimeException("Activity doesn't implement onEditingFinishedListener")
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Log.d("Fragment log", "onCreateView called")
         return inflater.inflate(R.layout.fragment_shop_item, container, false)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("Fragment log", "onCreate called")
         parseParams()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d("Fragment log", "onStart called")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("Fragment log", "onResume called")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d("Fragment log", "onPause called")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("Fragment log", "onDestroy called")
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        Log.d("Fragment log", "onDestroyView called")
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        Log.d("Fragment log", "onDetach called")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d("Fragment log", "onStop called")
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d("Fragment log", "onViewCreated called")
         viewModel = ViewModelProvider(this)[ShopItemViewModel::class.java]
         initViews(view)
         setViewModelListeners()
@@ -77,7 +132,8 @@ class ShopItemFragment : Fragment() {
                 etCount.error = if (it) "Error" else null
             }
             closeScreen.observe(viewLifecycleOwner) {
-                activity?.onBackPressedDispatcher?.onBackPressed()
+                //activity?.onBackPressedDispatcher?.onBackPressed()
+                onEditingFinishedListener.onEditingFinished()
             }
         }
     }

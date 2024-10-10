@@ -2,6 +2,7 @@ package com.example.android_view_edu.presentation
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
@@ -11,17 +12,20 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.android_view_edu.R
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedListener {
 
     private lateinit var viewModel: MainViewModel
     private lateinit var recyclerViewAdapter : ShopListAdapter
     private var shopItemFragmentContainer : FragmentContainerView? = null
 
+    override fun onEditingFinished() {
+        Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         shopItemFragmentContainer = findViewById(R.id.fragment_shop_items)
-
         setRecyclerView()
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         viewModel.shopItemListLiveData.observe(this){
@@ -40,7 +44,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun attachFragment(fragment : Fragment) {
         val transaction = supportFragmentManager.beginTransaction()
-        transaction.add(R.id.fragment_shop_items, fragment).commit()
+        supportFragmentManager.popBackStack()
+        transaction
+            .add(R.id.fragment_shop_items, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun isOnePaneMode() : Boolean {

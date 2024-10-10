@@ -7,22 +7,29 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.android_view_edu.R
 import com.example.android_view_edu.domain.ShopItem
 import com.google.android.material.textfield.TextInputLayout
 
-class ShopItemActivity : AppCompatActivity() {
+class ShopItemActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedListener {
 
     private var mode = UNDEFINED_MODE
     private var shopItemId = ShopItem.UNDEFINED_ID
+
+    override fun onEditingFinished() {
+        finish()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_shop_item)
         parseExtras()
-        insertFragmentIntoContainer()
+        if(savedInstanceState == null) {
+            insertFragmentIntoContainer()
+        }
     }
 
     private fun insertFragmentIntoContainer() {
